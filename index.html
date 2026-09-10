@@ -1,0 +1,2927 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Learning Support Referral</title>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --field-height: 46px;
+      --radius: 9px;
+      --border: #d0d5dd;
+      --text: #1f2933;
+      --muted: #667085;
+      --heading: #172033;
+      --primary: #263857;
+      --primary-hover: #1d2d48;
+      --background: #f6f7f9;
+      --notebook-background: url("assets/background.png");
+
+      --warning-bg: #fff8eb;
+      --warning-border: #f0d9a7;
+      --warning-text: #7a5815;
+
+      --danger-bg: #fff1f0;
+      --danger-border: #f2c5c2;
+      --danger-text: #9b2c2c;
+    }
+
+    body {
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      background-color: var(--background);
+      background-image:
+  
+        var(--notebook-background);
+      background-size: cover;
+      background-position: center top;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+
+    /* =========================================
+       ENTRY SCREENS
+    ========================================= */
+
+    .entry-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .entry-card {
+      width: 100%;
+      max-width: 560px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(228, 231, 236, 0.95);
+      border-radius: 14px;
+      padding: 32px;
+      box-shadow: 0 12px 34px rgba(23, 32, 51, 0.08);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+    }
+
+    .eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+
+    .entry-card h1 {
+      font-size: 28px;
+      line-height: 1.2;
+      color: var(--heading);
+      margin-bottom: 10px;
+    }
+
+    .entry-intro {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    .entry-button {
+      width: 100%;
+      height: var(--field-height);
+      border: none;
+      border-radius: var(--radius);
+      background: var(--primary);
+      color: #ffffff;
+      padding: 0 20px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
+    .entry-button:hover:not(:disabled) {
+      background: var(--primary-hover);
+    }
+
+    .access-error {
+      display: none;
+      margin-top: 14px;
+      padding: 13px 14px;
+      border-radius: var(--radius);
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-border);
+      color: var(--danger-text);
+      font-size: 13px;
+    }
+
+    #parentScreen {
+      display: none;
+    }
+
+
+    /* =========================================
+       PARENT CONFIRMATION
+    ========================================= */
+
+    .parent-question {
+      border: 1px solid #e4e7ec;
+      border-radius: var(--radius);
+      padding: 18px;
+      background: #fafbfc;
+    }
+
+    .radio-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: var(--field-height);
+      padding: 0 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: #ffffff;
+      cursor: pointer;
+      margin: 0;
+      font-weight: 500;
+    }
+
+    .radio-option input {
+      width: auto;
+      height: auto;
+      margin: 0;
+    }
+
+    .stop-message {
+      display: none;
+      margin-top: 14px;
+      padding: 14px 15px;
+      border-radius: var(--radius);
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-border);
+      color: var(--danger-text);
+      font-size: 13px;
+    }
+
+
+    /* =========================================
+       MAIN FORM
+    ========================================= */
+
+    .form-page {
+      display: none;
+    }
+
+    .form-page.show {
+      display: block;
+    }
+
+    .page {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 48px 24px 70px;
+    }
+
+    .header {
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 30px;
+      line-height: 1.2;
+      color: var(--heading);
+      margin-bottom: 10px;
+    }
+
+    .intro {
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 650px;
+    }
+
+    .logged-in {
+      margin-top: 12px;
+      font-size: 12px;
+      color: #667085;
+    }
+
+    .logged-in strong {
+      color: #344054;
+    }
+
+    .form-card {
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(228, 231, 236, 0.95);
+      border-radius: 14px;
+      padding: 30px;
+      box-shadow: 0 12px 34px rgba(23, 32, 51, 0.08);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+    }
+
+    .section {
+      padding: 4px 0 28px;
+      margin-bottom: 28px;
+      border-bottom: 1px solid #eaecf0;
+    }
+
+    .section:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .section-title {
+      font-size: 17px;
+      color: var(--heading);
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    .section-description {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #344054;
+      margin-bottom: 7px;
+    }
+
+    .required {
+      color: #c2413b;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+      font: inherit;
+      border-radius: var(--radius);
+    }
+
+    input,
+    select {
+      width: 100%;
+      height: var(--field-height);
+      border: 1px solid var(--border);
+      padding: 0 12px;
+      background: #ffffff;
+      color: var(--heading);
+      outline: none;
+    }
+
+    select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      border-radius: var(--radius) !important;
+      padding-right: 42px;
+
+      background-image:
+        linear-gradient(45deg, transparent 50%, #667085 50%),
+        linear-gradient(135deg, #667085 50%, transparent 50%);
+
+      background-position:
+        calc(100% - 18px) 20px,
+        calc(100% - 13px) 20px;
+
+      background-size:
+        5px 5px,
+        5px 5px;
+
+      background-repeat: no-repeat;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 130px;
+      border: 1px solid var(--border);
+      padding: 12px;
+      background: #ffffff;
+      color: var(--heading);
+      outline: none;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #6676c5;
+      box-shadow:
+        0 0 0 3px
+        rgba(102, 118, 197, 0.12);
+    }
+
+    .notice {
+      background: var(--warning-bg);
+      border: 1px solid var(--warning-border);
+      color: var(--warning-text);
+      padding: 14px 15px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      line-height: 1.55;
+      margin-bottom: 20px;
+    }
+
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .checkbox-card {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: var(--field-height);
+      border: 1px solid #e1e5ea;
+      border-radius: var(--radius);
+      padding: 0 12px;
+      font-size: 13px;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .checkbox-card input {
+      width: auto;
+      height: auto;
+      margin: 0;
+    }
+
+    .other-field {
+      display: none;
+      margin-top: 14px;
+    }
+
+    .other-field.show {
+      display: block;
+    }
+
+    .helper {
+      margin-top: 6px;
+      color: #7b8494;
+      font-size: 12px;
+    }
+
+
+    /* =========================================
+       UPLOAD
+    ========================================= */
+
+    .upload-box {
+      border: 1.5px dashed #c9ced6;
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+      background: #fafbfc;
+      cursor: pointer;
+    }
+
+    .upload-box:hover {
+      border-color: #8993a4;
+      background: #f8f9fb;
+    }
+
+    .upload-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #344054;
+      margin-bottom: 5px;
+    }
+
+    .upload-subtitle {
+      font-size: 12px;
+      color: #7b8494;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .file-list {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .file-item {
+      min-height: var(--field-height);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: #f7f8fa;
+      border: 1px solid #e4e7ec;
+      border-radius: var(--radius);
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #475467;
+    }
+
+    .file-info {
+      min-width: 0;
+    }
+
+    .file-name {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .file-size {
+      display: block;
+      color: #98a2b3;
+      margin-top: 2px;
+    }
+
+    .remove-file {
+      border: none;
+      background: none;
+      color: #b42318;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+
+    /* =========================================
+       SUBMIT
+    ========================================= */
+
+    .submit-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 26px;
+    }
+
+    .submit-button {
+      min-width: 150px;
+      height: var(--field-height);
+      border: none;
+      background: var(--primary);
+      color: #ffffff;
+      padding: 0 22px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .submit-button:hover:not(:disabled) {
+      background: var(--primary-hover);
+    }
+
+    .submission-message {
+      display: none;
+      margin-top: 16px;
+      padding: 13px 15px;
+      border-radius: var(--radius);
+      font-size: 13px;
+    }
+
+    .submission-message.error {
+      display: block;
+      color: var(--danger-text);
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-border);
+    }
+
+
+    /* =========================================
+       SUCCESS
+    ========================================= */
+
+    .success {
+      display: none;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(228, 231, 236, 0.95);
+      border-radius: 14px;
+      padding: 48px 30px;
+      text-align: center;
+    }
+
+    .success h2 {
+      font-size: 23px;
+      margin-bottom: 9px;
+      color: var(--heading);
+    }
+
+    .success p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+
+    /* =========================================
+       MOBILE
+    ========================================= */
+
+    @media (max-width: 650px) {
+
+      body {
+        background-attachment: scroll;
+        background-position: center top;
+      }
+
+      .page {
+        padding: 30px 16px 50px;
+      }
+
+      .form-card {
+        padding: 22px 18px;
+      }
+
+      .grid,
+      .checkbox-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .radio-row {
+        flex-direction: column;
+      }
+
+      .entry-card {
+        padding: 24px;
+      }
+
+    }
+
+
+    /* Hide the browser scrollbar while keeping the page scrollable */
+    html {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    /* Subtle support contact */
+    .support-contact {
+      position: fixed;
+      right: 18px;
+      bottom: 14px;
+      z-index: 20;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(208, 213, 221, 0.72);
+      color: #667085;
+      font-size: 11px;
+      line-height: 1;
+      text-decoration: none;
+      opacity: 0.72;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      transition: opacity 0.18s ease, background 0.18s ease;
+    }
+
+    .support-contact:hover {
+      opacity: 1;
+      background: rgba(255, 255, 255, 0.94);
+      color: #344054;
+    }
+
+    @media (max-width: 650px) {
+      .support-contact {
+        right: 10px;
+        bottom: 10px;
+        font-size: 10px;
+        padding: 6px 8px;
+      }
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+
+<!-- =========================================
+     STEP 1 — EMAIL ACCESS
+========================================= -->
+
+<div
+  class="entry-screen"
+  id="accessScreen"
+>
+
+  <div class="entry-card">
+
+    <div class="eyebrow">
+      Learning Support
+    </div>
+
+    <h1>
+      Student Referral Portal
+    </h1>
+
+    <p class="entry-intro">
+      This referral portal is for authorized school staff only.
+      Enter your school email address to continue.
+    </p>
+
+    <div class="field">
+
+      <label for="accessEmail">
+        School Email
+        <span class="required">*</span>
+      </label>
+
+      <input
+        type="email"
+        id="accessEmail"
+        placeholder="name@ras.ac.th"
+        autocomplete="email"
+      >
+
+    </div>
+
+    <button
+      type="button"
+      class="entry-button"
+      id="accessButton"
+    >
+      Continue
+    </button>
+
+    <div
+      class="access-error"
+      id="accessError"
+    ></div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================
+     STEP 2 — PARENT CONFIRMATION
+========================================= -->
+
+<div
+  class="entry-screen"
+  id="parentScreen"
+>
+
+  <div class="entry-card">
+
+    <div class="eyebrow">
+      Learning Support
+    </div>
+
+    <h1>
+      Before You Begin
+    </h1>
+
+    <p class="entry-intro">
+      Parent or guardian communication is required before a
+      Learning Support referral can be submitted.
+    </p>
+
+    <div class="parent-question">
+
+      <label>
+        Have concerns been discussed with the student's parents/guardians?
+        <span class="required">*</span>
+      </label>
+
+      <div class="radio-row">
+
+        <label class="radio-option">
+
+          <input
+            type="radio"
+            name="parentDiscussed"
+            value="yes"
+          >
+
+          Yes
+
+        </label>
+
+        <label class="radio-option">
+
+          <input
+            type="radio"
+            name="parentDiscussed"
+            value="no"
+          >
+
+          No
+
+        </label>
+
+      </div>
+
+      <div
+        class="stop-message"
+        id="stopMessage"
+      >
+        Please discuss your concerns with the student's
+        parent or guardian before completing a Learning
+        Support referral. You may return once parent
+        communication has taken place.
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================
+     STEP 3 — REFERRAL FORM
+========================================= -->
+
+<div
+  class="form-page"
+  id="formPage"
+>
+
+  <div class="page">
+
+    <div
+      class="header"
+      id="formHeader"
+    >
+
+      <div class="eyebrow">
+        Learning Support
+      </div>
+
+      <h1>
+        Student Referral Form
+      </h1>
+
+      <p class="intro">
+        Please complete this form when referring a student
+        to the Learning Support team. Provide as much specific
+        information as possible so the team can properly review
+        the concern.
+      </p>
+
+      <div class="logged-in">
+        Referral submitted by:
+        <strong id="loggedInEmail"></strong>
+      </div>
+
+    </div>
+
+
+    <form
+      class="form-card"
+      id="referralForm"
+    >
+
+      <div class="notice">
+
+        <strong>
+          Please provide detailed information.
+        </strong>
+
+        One-line responses are usually not enough for the
+        Learning Support team to understand the concern.
+        Include specific examples, how often the difficulty
+        occurs, when it is most noticeable, what support has
+        already been tried, and how the student responds.
+        The more detailed the referral is, the better the team
+        can understand and respond to the student's needs.
+
+      </div>
+
+
+      <!-- STUDENT INFORMATION -->
+
+      <section class="section">
+
+        <div class="section-title">
+          Student Information
+        </div>
+
+        <div class="grid">
+
+          <div class="field">
+
+            <label>
+              Student First Name
+              <span class="required">*</span>
+            </label>
+
+            <input
+              type="text"
+              name="firstName"
+              required
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Student Last Name
+              <span class="required">*</span>
+            </label>
+
+            <input
+              type="text"
+              name="lastName"
+              required
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Student Nickname
+              <span class="required">*</span>
+            </label>
+
+            <input
+              type="text"
+              name="nickname"
+              required
+              placeholder="Name commonly used at school"
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Class
+              <span class="required">*</span>
+            </label>
+
+            <select
+              name="className"
+              required
+            >
+
+              <option value="">
+                Select class
+              </option>
+
+              <option value="Nursery">
+                Nursery
+              </option>
+
+              <option value="Pre-School">
+                Pre-School
+              </option>
+
+              <option value="Pre-Kindergarten">
+                Pre-Kindergarten
+              </option>
+
+              <option value="Kindergarten">
+                Kindergarten
+              </option>
+
+              <option value="Grade 1">
+                Grade 1
+              </option>
+
+              <option value="Grade 2">
+                Grade 2
+              </option>
+
+              <option value="Grade 3">
+                Grade 3
+              </option>
+
+              <option value="Grade 4">
+                Grade 4
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Homeroom / Referring Teacher
+              <span class="required">*</span>
+            </label>
+
+            <input
+              type="text"
+              name="teacherName"
+              required
+            >
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- AREA OF CONCERN -->
+
+      <section class="section">
+
+        <div class="section-title">
+          Area of Concern
+        </div>
+
+        <div class="section-description">
+          Select all areas that apply.
+        </div>
+
+        <div class="checkbox-grid">
+
+          <label class="checkbox-card">
+            <input
+              type="checkbox"
+              name="concern"
+              value="Reading"
+            >
+            Reading
+          </label>
+
+          <label class="checkbox-card">
+            <input
+              type="checkbox"
+              name="concern"
+              value="Writing"
+            >
+            Writing
+          </label>
+
+          <label class="checkbox-card">
+            <input
+              type="checkbox"
+              name="concern"
+              value="Mathematics"
+            >
+            Mathematics
+          </label>
+
+          <label class="checkbox-card">
+            <input
+              type="checkbox"
+              name="concern"
+              value="Attention / Focus"
+            >
+            Attention / Focus
+          </label>
+
+          <label class="checkbox-card">
+            <input
+              type="checkbox"
+              name="concern"
+              value="Behavior"
+            >
+            Behavior
+          </label>
+
+          <label class="checkbox-card">
+            <input
+              type="checkbox"
+              name="concern"
+              value="Social / Emotional"
+            >
+            Social / Emotional
+          </label>
+
+          <label class="checkbox-card">
+            <input
+              type="checkbox"
+              name="concern"
+              value="Communication"
+            >
+            Communication
+          </label>
+
+          <label class="checkbox-card">
+            <input
+              type="checkbox"
+              name="concern"
+              value="Other"
+              id="otherCheckbox"
+            >
+            Other
+          </label>
+
+        </div>
+
+        <div
+          class="other-field"
+          id="otherField"
+        >
+
+          <label>
+            Please specify
+            <span class="required">*</span>
+          </label>
+
+          <input
+            type="text"
+            id="otherConcern"
+            name="otherConcern"
+            placeholder="Please specify the area of concern"
+          >
+
+        </div>
+
+      </section>
+
+
+      <!-- REFERRAL INFORMATION -->
+
+      <section class="section">
+
+        <div class="section-title">
+          Referral Information
+        </div>
+
+        <div class="field">
+
+          <label>
+            Describe your concern
+            <span class="required">*</span>
+          </label>
+
+          <textarea
+            name="concernDescription"
+            required
+            placeholder="Please describe the concern in detail. Include specific examples of what you have observed, how often it occurs, and when it is most noticeable."
+          ></textarea>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            What strategies or support have already been tried?
+            <span class="required">*</span>
+          </label>
+
+          <textarea
+            name="strategies"
+            required
+            placeholder="Describe the strategies, accommodations, interventions, or classroom support you have already tried and how the student responded."
+          ></textarea>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Student strengths
+            <span class="required">*</span>
+          </label>
+
+          <textarea
+            name="strengths"
+            required
+            placeholder="Describe the student's strengths, interests, successful learning situations, or areas where they demonstrate confidence."
+          ></textarea>
+
+        </div>
+
+      </section>
+
+
+      <!-- PARENT COMMUNICATION -->
+
+      <section class="section">
+
+        <div class="section-title">
+          Parent Communication
+        </div>
+
+        <div class="section-description">
+          Provide a brief record of the discussion that has already taken place
+          with the student's parent or guardian.
+        </div>
+
+        <div class="field">
+
+          <label>
+            Date of parent communication
+            <span class="required">*</span>
+          </label>
+
+          <input
+            type="date"
+            name="parentCommunicationDate"
+            required
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Summary of parent communication
+            <span class="required">*</span>
+          </label>
+
+          <textarea
+            name="parentCommunication"
+            required
+            placeholder="Briefly summarize what concerns were shared, the parent's response, and any relevant information provided by the family."
+          ></textarea>
+
+        </div>
+
+      </section>
+
+
+      <!-- SUPPORTING EVIDENCE -->
+
+      <section class="section">
+
+        <div class="section-title">
+          Supporting Evidence
+        </div>
+
+        <div class="section-description">
+          Upload relevant documents that may help the Learning Support
+          team review the referral.
+        </div>
+
+        <label
+          class="upload-box"
+          for="fileInput"
+        >
+
+          <div class="upload-title">
+            Click to upload supporting files
+          </div>
+
+          <div class="upload-subtitle">
+            Parent communication screenshots, student work samples,
+            assessment results, PDFs, Word documents or images
+          </div>
+
+        </label>
+
+        <input
+          id="fileInput"
+          type="file"
+          multiple
+          accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+        >
+
+        <div
+          class="file-list"
+          id="fileList"
+        ></div>
+
+        <div class="helper">
+          Maximum 8 MB per file and 20 MB total.
+        </div>
+
+      </section>
+
+
+      <div
+        class="submission-message"
+        id="submissionMessage"
+      ></div>
+
+      <div class="submit-row">
+
+        <button
+          class="submit-button"
+          id="submitButton"
+          type="submit"
+        >
+          Submit Referral
+        </button>
+
+      </div>
+
+    </form>
+
+
+    <!-- SUCCESS -->
+
+    <div
+      class="success"
+      id="successMessage"
+    >
+
+      <h2>
+        Referral submitted
+      </h2>
+
+      <p>
+        Your referral has been sent to the Learning Support team.
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- Support contact -->
+<a
+  class="support-contact"
+  href="mailto:katelyn_i@ras.ac.th"
+  aria-label="Contact Learning Support with questions or issues"
+>
+  Questions or issues? Contact katelyn_i@ras.ac.th
+</a>
+
+<!-- =========================================
+     HIDDEN POST TARGET
+========================================= -->
+
+<iframe
+  name="submissionTarget"
+  id="submissionTarget"
+  style="display:none;"
+></iframe>
+
+
+<script>
+
+/*
+=========================================================
+CONFIG
+=========================================================
+*/
+
+const BACKEND_URL =
+  "https://script.google.com/macros/s/AKfycbyx-3-BWZyA5Op-tKsYZTdBCcXS2IH5bDYeTRUxclLLFpGI5t-vLS9-PLAYkDNcz8Mt8A/exec";
+
+
+const MAX_FILE_SIZE =
+  8 * 1024 * 1024;
+
+
+const MAX_TOTAL_SIZE =
+  20 * 1024 * 1024;
+
+
+/*
+=========================================================
+STATE
+=========================================================
+*/
+
+let verifiedTeacherEmail = "";
+
+let verifiedTeacherName = "";
+
+let selectedFiles = [];
+
+let submissionInProgress = false;
+
+
+/*
+=========================================================
+ELEMENTS
+=========================================================
+*/
+
+const accessScreen =
+  document.getElementById(
+    "accessScreen"
+  );
+
+
+const accessEmail =
+  document.getElementById(
+    "accessEmail"
+  );
+
+
+const accessButton =
+  document.getElementById(
+    "accessButton"
+  );
+
+
+const accessError =
+  document.getElementById(
+    "accessError"
+  );
+
+
+const parentScreen =
+  document.getElementById(
+    "parentScreen"
+  );
+
+
+const formPage =
+  document.getElementById(
+    "formPage"
+  );
+
+
+const formHeader =
+  document.getElementById(
+    "formHeader"
+  );
+
+
+const loggedInEmail =
+  document.getElementById(
+    "loggedInEmail"
+  );
+
+
+const stopMessage =
+  document.getElementById(
+    "stopMessage"
+  );
+
+
+const otherCheckbox =
+  document.getElementById(
+    "otherCheckbox"
+  );
+
+
+const otherField =
+  document.getElementById(
+    "otherField"
+  );
+
+
+const otherConcern =
+  document.getElementById(
+    "otherConcern"
+  );
+
+
+const fileInput =
+  document.getElementById(
+    "fileInput"
+  );
+
+
+const fileList =
+  document.getElementById(
+    "fileList"
+  );
+
+
+const form =
+  document.getElementById(
+    "referralForm"
+  );
+
+
+const submitButton =
+  document.getElementById(
+    "submitButton"
+  );
+
+
+const submissionMessage =
+  document.getElementById(
+    "submissionMessage"
+  );
+
+
+const successMessage =
+  document.getElementById(
+    "successMessage"
+  );
+
+
+/*
+=========================================================
+EMAIL ACCESS
+=========================================================
+*/
+
+accessButton.addEventListener(
+  "click",
+  checkAccess
+);
+
+
+accessEmail.addEventListener(
+  "keydown",
+  function(event) {
+
+    if (
+      event.key === "Enter"
+    ) {
+
+      event.preventDefault();
+
+      checkAccess();
+
+    }
+
+  }
+);
+
+
+accessEmail.addEventListener(
+  "input",
+  function() {
+
+    accessError.style.display =
+      "none";
+
+  }
+);
+
+
+function checkAccess() {
+
+  const email =
+    accessEmail.value
+      .trim()
+      .toLowerCase();
+
+
+  if (!email) {
+
+    showAccessError(
+      "Please enter your school email address."
+    );
+
+    accessEmail.focus();
+
+    return;
+
+  }
+
+
+  if (
+    !accessEmail.checkValidity()
+  ) {
+
+    showAccessError(
+      "Please enter a valid email address."
+    );
+
+    accessEmail.focus();
+
+    return;
+
+  }
+
+
+  accessButton.disabled =
+    true;
+
+
+  accessButton.textContent =
+    "Checking access...";
+
+
+  accessError.style.display =
+    "none";
+
+
+  jsonpRequest(
+    {
+      action:
+        "checkAccess",
+
+      email:
+        email
+    },
+
+    function(response) {
+
+      accessButton.disabled =
+        false;
+
+
+      accessButton.textContent =
+        "Continue";
+
+
+      if (
+        !response ||
+        response.success !== true
+      ) {
+
+        showAccessError(
+          response &&
+          response.message
+
+            ? response.message
+
+            : "We could not verify your access. Please try again."
+        );
+
+        return;
+
+      }
+
+
+      if (
+        response.authorized !== true
+      ) {
+
+        showAccessError(
+          "This email address does not have access to the Learning Support referral portal. Please contact the Learning Support team if you believe this is an error."
+        );
+
+        return;
+
+      }
+
+
+      verifiedTeacherEmail =
+        email;
+
+
+      verifiedTeacherName =
+        response.name || "";
+
+
+      loggedInEmail.textContent =
+
+        verifiedTeacherName
+
+          ? verifiedTeacherName +
+            " (" +
+            verifiedTeacherEmail +
+            ")"
+
+          : verifiedTeacherEmail;
+
+
+      accessScreen.style.display =
+        "none";
+
+
+      parentScreen.style.display =
+        "flex";
+
+
+      window.scrollTo({
+        top: 0
+      });
+
+    },
+
+    function() {
+
+      accessButton.disabled =
+        false;
+
+
+      accessButton.textContent =
+        "Continue";
+
+
+      showAccessError(
+        "We could not connect to the referral system. Please try again."
+      );
+
+    }
+
+  );
+
+}
+
+
+function showAccessError(
+  message
+) {
+
+  accessError.textContent =
+    message;
+
+
+  accessError.style.display =
+    "block";
+
+}
+
+
+/*
+=========================================================
+PARENT CONFIRMATION
+=========================================================
+*/
+
+document
+  .querySelectorAll(
+    'input[name="parentDiscussed"]'
+  )
+  .forEach(
+    function(input) {
+
+      input.addEventListener(
+        "change",
+        handleParentAnswer
+      );
+
+    }
+  );
+
+
+function handleParentAnswer() {
+
+  const answer =
+    document.querySelector(
+      'input[name="parentDiscussed"]:checked'
+    );
+
+
+  if (!answer) {
+    return;
+  }
+
+
+  if (
+    answer.value === "yes"
+  ) {
+
+    stopMessage.style.display =
+      "none";
+
+
+    parentScreen.style.display =
+      "none";
+
+
+    formPage.classList.add(
+      "show"
+    );
+
+
+    window.scrollTo({
+      top: 0
+    });
+
+
+    return;
+
+  }
+
+
+  stopMessage.style.display =
+    "block";
+
+}
+
+
+/*
+=========================================================
+OTHER CONCERN
+=========================================================
+*/
+
+otherCheckbox.addEventListener(
+  "change",
+  toggleOtherField
+);
+
+
+function toggleOtherField() {
+
+  if (
+    otherCheckbox.checked
+  ) {
+
+    otherField.classList.add(
+      "show"
+    );
+
+
+    otherConcern.required =
+      true;
+
+
+    otherConcern.focus();
+
+  }
+
+  else {
+
+    otherField.classList.remove(
+      "show"
+    );
+
+
+    otherConcern.required =
+      false;
+
+
+    otherConcern.value =
+      "";
+
+  }
+
+}
+
+
+/*
+=========================================================
+FILES
+=========================================================
+*/
+
+fileInput.addEventListener(
+  "change",
+  function() {
+
+    const incoming =
+      Array.from(
+        fileInput.files
+      );
+
+
+    for (
+      const file of incoming
+    ) {
+
+      if (
+        file.size >
+        MAX_FILE_SIZE
+      ) {
+
+        alert(
+          file.name +
+          " is larger than 8 MB."
+        );
+
+        continue;
+
+      }
+
+
+      const currentTotal =
+        selectedFiles.reduce(
+          function(total, existing) {
+
+            return (
+              total +
+              existing.size
+            );
+
+          },
+          0
+        );
+
+
+      if (
+        currentTotal +
+        file.size >
+        MAX_TOTAL_SIZE
+      ) {
+
+        alert(
+          "The total upload size cannot exceed 20 MB."
+        );
+
+        break;
+
+      }
+
+
+      selectedFiles.push(
+        file
+      );
+
+    }
+
+
+    fileInput.value =
+      "";
+
+
+    renderFiles();
+
+  }
+);
+
+
+function renderFiles() {
+
+  fileList.innerHTML =
+    "";
+
+
+  selectedFiles.forEach(
+    function(file, index) {
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+
+      item.className =
+        "file-item";
+
+
+      const info =
+        document.createElement(
+          "div"
+        );
+
+
+      info.className =
+        "file-info";
+
+
+      const name =
+        document.createElement(
+          "span"
+        );
+
+
+      name.className =
+        "file-name";
+
+
+      name.textContent =
+        file.name;
+
+
+      const size =
+        document.createElement(
+          "span"
+        );
+
+
+      size.className =
+        "file-size";
+
+
+      size.textContent =
+        formatFileSize(
+          file.size
+        );
+
+
+      info.appendChild(
+        name
+      );
+
+
+      info.appendChild(
+        size
+      );
+
+
+      const remove =
+        document.createElement(
+          "button"
+        );
+
+
+      remove.type =
+        "button";
+
+
+      remove.className =
+        "remove-file";
+
+
+      remove.textContent =
+        "Remove";
+
+
+      remove.addEventListener(
+        "click",
+        function() {
+
+          selectedFiles.splice(
+            index,
+            1
+          );
+
+
+          renderFiles();
+
+        }
+      );
+
+
+      item.appendChild(
+        info
+      );
+
+
+      item.appendChild(
+        remove
+      );
+
+
+      fileList.appendChild(
+        item
+      );
+
+    }
+  );
+
+}
+
+
+function formatFileSize(
+  bytes
+) {
+
+  if (
+    bytes < 1024
+  ) {
+
+    return (
+      bytes +
+      " B"
+    );
+
+  }
+
+
+  if (
+    bytes <
+    1024 * 1024
+  ) {
+
+    return (
+      (
+        bytes /
+        1024
+      ).toFixed(1) +
+      " KB"
+    );
+
+  }
+
+
+  return (
+    (
+      bytes /
+      1024 /
+      1024
+    ).toFixed(1) +
+    " MB"
+  );
+
+}
+
+
+/*
+=========================================================
+SUBMIT
+=========================================================
+*/
+
+form.addEventListener(
+  "submit",
+  submitReferral
+);
+
+
+async function submitReferral(
+  event
+) {
+
+  event.preventDefault();
+
+
+  if (
+    submissionInProgress
+  ) {
+    return;
+  }
+
+
+  if (
+    !verifiedTeacherEmail
+  ) {
+
+    showSubmissionError(
+      "Your teacher email could not be verified. Please reload the page."
+    );
+
+    return;
+
+  }
+
+
+  const concerns =
+    Array.from(
+      document.querySelectorAll(
+        'input[name="concern"]:checked'
+      )
+    );
+
+
+  if (
+    concerns.length === 0
+  ) {
+
+    alert(
+      "Please select at least one area of concern."
+    );
+
+    return;
+
+  }
+
+
+  if (
+    otherCheckbox.checked &&
+    !otherConcern.value.trim()
+  ) {
+
+    otherConcern.focus();
+
+
+    alert(
+      "Please specify the other area of concern."
+    );
+
+
+    return;
+
+  }
+
+
+  if (
+    !form.checkValidity()
+  ) {
+
+    form.reportValidity();
+
+    return;
+
+  }
+
+
+  submissionInProgress =
+    true;
+
+
+  submitButton.disabled =
+    true;
+
+
+  submitButton.textContent =
+    "Submitting...";
+
+
+  submissionMessage.className =
+    "submission-message";
+
+
+  submissionMessage.style.display =
+    "none";
+
+
+  try {
+
+    const files =
+      [];
+
+
+    for (
+      const file of selectedFiles
+    ) {
+
+      const base64 =
+        await fileToBase64(
+          file
+        );
+
+
+      files.push({
+
+        name:
+          file.name,
+
+        type:
+          file.type ||
+          "application/octet-stream",
+
+        base64:
+          base64
+
+      });
+
+    }
+
+
+    const formData =
+      new FormData(
+        form
+      );
+
+
+    const submissionId =
+      createSubmissionId();
+
+
+    const payload = {
+
+      submissionId:
+        submissionId,
+
+      teacherEmail:
+        verifiedTeacherEmail,
+
+      teacherName:
+        String(
+          formData.get(
+            "teacherName"
+          ) || ""
+        ).trim(),
+
+      firstName:
+        String(
+          formData.get(
+            "firstName"
+          ) || ""
+        ).trim(),
+
+      lastName:
+        String(
+          formData.get(
+            "lastName"
+          ) || ""
+        ).trim(),
+
+      nickname:
+        String(
+          formData.get(
+            "nickname"
+          ) || ""
+        ).trim(),
+
+      className:
+        String(
+          formData.get(
+            "className"
+          ) || ""
+        ).trim(),
+
+      concerns:
+        concerns.map(
+          function(item) {
+
+            return item.value;
+
+          }
+        ),
+
+      otherConcern:
+        otherCheckbox.checked
+
+          ? otherConcern.value.trim()
+
+          : "",
+
+      concernDescription:
+        String(
+          formData.get(
+            "concernDescription"
+          ) || ""
+        ).trim(),
+
+      strategies:
+        String(
+          formData.get(
+            "strategies"
+          ) || ""
+        ).trim(),
+
+      strengths:
+        String(
+          formData.get(
+            "strengths"
+          ) || ""
+        ).trim(),
+
+      parentCommunicationDate:
+        String(
+          formData.get(
+            "parentCommunicationDate"
+          ) || ""
+        ).trim(),
+
+      parentCommunication:
+        String(
+          formData.get(
+            "parentCommunication"
+          ) || ""
+        ).trim(),
+
+      files:
+        files
+
+    };
+
+
+    sendReferralToBackend(
+      payload
+    );
+
+
+    await delay(
+      250
+    );
+
+
+    const result =
+      await waitForSubmission(
+        submissionId
+      );
+
+
+    if (
+      result.status ===
+      "complete"
+    ) {
+
+      showSuccess();
+
+      return;
+
+    }
+
+
+    throw new Error(
+      result.message ||
+      "The referral could not be submitted."
+    );
+
+  }
+
+  catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    showSubmissionError(
+      error.message ||
+      "The referral could not be submitted. Please try again."
+    );
+
+
+    submitButton.disabled =
+      false;
+
+
+    submitButton.textContent =
+      "Submit Referral";
+
+
+    submissionInProgress =
+      false;
+
+  }
+
+}
+
+
+/*
+=========================================================
+POST THROUGH HIDDEN FORM
+=========================================================
+*/
+
+function sendReferralToBackend(
+  payload
+) {
+
+  const postForm =
+    document.createElement(
+      "form"
+    );
+
+
+  postForm.method =
+    "POST";
+
+
+  postForm.action =
+    BACKEND_URL;
+
+
+  postForm.target =
+    "submissionTarget";
+
+
+  postForm.style.display =
+    "none";
+
+
+  const payloadInput =
+    document.createElement(
+      "input"
+    );
+
+
+  payloadInput.type =
+    "hidden";
+
+
+  payloadInput.name =
+    "payload";
+
+
+  payloadInput.value =
+    JSON.stringify(
+      payload
+    );
+
+
+  postForm.appendChild(
+    payloadInput
+  );
+
+
+  document.body.appendChild(
+    postForm
+  );
+
+
+  postForm.submit();
+
+
+  setTimeout(
+    function() {
+
+      if (
+        postForm.parentNode
+      ) {
+
+        postForm.parentNode.removeChild(
+          postForm
+        );
+
+      }
+
+    },
+    1500
+  );
+
+}
+
+
+/*
+=========================================================
+WAIT FOR BACKEND
+=========================================================
+*/
+
+async function waitForSubmission(
+  submissionId
+) {
+
+  let connectionFailures =
+    0;
+
+
+  for (
+    let attempt = 0;
+    attempt < 60;
+    attempt++
+  ) {
+
+    await delay(
+      600
+    );
+
+
+    try {
+
+      const response =
+        await jsonpPromise({
+
+          action:
+            "submissionStatus",
+
+          submissionId:
+            submissionId
+
+        });
+
+
+      console.log(
+        "Submission status:",
+        response
+      );
+
+
+      connectionFailures =
+        0;
+
+
+      if (
+        response.status ===
+        "complete"
+      ) {
+
+        return response;
+
+      }
+
+
+      if (
+        response.status ===
+        "error"
+      ) {
+
+        throw new Error(
+          response.message ||
+          "The backend reported an error."
+        );
+
+      }
+
+    }
+
+    catch (error) {
+
+      if (
+        error.message &&
+        error.message !==
+        "Request timed out." &&
+        error.message !==
+        "Could not connect."
+      ) {
+
+        throw error;
+
+      }
+
+
+      connectionFailures++;
+
+
+      console.warn(
+        "Status check failed:",
+        error
+      );
+
+
+      if (
+        connectionFailures >= 5
+      ) {
+
+        throw new Error(
+          "The website could not confirm the referral with the server."
+        );
+
+      }
+
+    }
+
+  }
+
+
+  throw new Error(
+    "The referral was sent, but the website could not confirm that processing finished. Please check the Learning Support Drive before submitting again."
+  );
+
+}
+
+
+/*
+=========================================================
+SUCCESS
+=========================================================
+*/
+
+function showSuccess() {
+
+  form.style.display =
+    "none";
+
+
+  formHeader.style.display =
+    "none";
+
+
+  successMessage.style.display =
+    "block";
+
+
+  submissionInProgress =
+    false;
+
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+}
+
+
+/*
+=========================================================
+ERROR
+=========================================================
+*/
+
+function showSubmissionError(
+  message
+) {
+
+  submissionMessage.textContent =
+    message;
+
+
+  submissionMessage.className =
+    "submission-message error";
+
+}
+
+
+/*
+=========================================================
+FILE TO BASE64
+=========================================================
+*/
+
+function fileToBase64(
+  file
+) {
+
+  return new Promise(
+    function(
+      resolve,
+      reject
+    ) {
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload =
+        function() {
+
+          const result =
+            String(
+              reader.result || ""
+            );
+
+
+          const comma =
+            result.indexOf(
+              ","
+            );
+
+
+          resolve(
+            comma >= 0
+
+              ? result.substring(
+                  comma + 1
+                )
+
+              : result
+          );
+
+        };
+
+
+      reader.onerror =
+        function() {
+
+          reject(
+            new Error(
+              "Could not read " +
+              file.name
+            )
+          );
+
+        };
+
+
+      reader.readAsDataURL(
+        file
+      );
+
+    }
+  );
+
+}
+
+
+/*
+=========================================================
+JSONP
+=========================================================
+*/
+
+function jsonpRequest(
+  params,
+  success,
+  failure
+) {
+
+  const callbackName =
+    "lsCallback_" +
+    Date.now() +
+    "_" +
+    Math.floor(
+      Math.random() *
+      100000
+    );
+
+
+  params.callback =
+    callbackName;
+
+
+  params.t =
+    Date.now();
+
+
+  const script =
+    document.createElement(
+      "script"
+    );
+
+
+  const search =
+    new URLSearchParams(
+      params
+    );
+
+
+  script.src =
+    BACKEND_URL +
+    "?" +
+    search.toString();
+
+
+  let finished =
+    false;
+
+
+  const timeout =
+    setTimeout(
+      function() {
+
+        if (
+          finished
+        ) {
+          return;
+        }
+
+
+        finished =
+          true;
+
+
+        cleanup();
+
+
+        if (
+          failure
+        ) {
+
+          failure(
+            new Error(
+              "Request timed out."
+            )
+          );
+
+        }
+
+      },
+      15000
+    );
+
+
+  window[
+    callbackName
+  ] =
+    function(response) {
+
+      if (
+        finished
+      ) {
+        return;
+      }
+
+
+      finished =
+        true;
+
+
+      cleanup();
+
+
+      success(
+        response
+      );
+
+    };
+
+
+  script.onerror =
+    function() {
+
+      if (
+        finished
+      ) {
+        return;
+      }
+
+
+      finished =
+        true;
+
+
+      cleanup();
+
+
+      if (
+        failure
+      ) {
+
+        failure(
+          new Error(
+            "Could not connect."
+          )
+        );
+
+      }
+
+    };
+
+
+  function cleanup() {
+
+    clearTimeout(
+      timeout
+    );
+
+
+    try {
+
+      delete window[
+        callbackName
+      ];
+
+    }
+
+    catch (error) {}
+
+
+    if (
+      script.parentNode
+    ) {
+
+      script.parentNode.removeChild(
+        script
+      );
+
+    }
+
+  }
+
+
+  document.body.appendChild(
+    script
+  );
+
+}
+
+
+/*
+=========================================================
+JSONP PROMISE
+=========================================================
+*/
+
+function jsonpPromise(
+  params
+) {
+
+  return new Promise(
+    function(
+      resolve,
+      reject
+    ) {
+
+      jsonpRequest(
+        params,
+        resolve,
+        reject
+      );
+
+    }
+  );
+
+}
+
+
+/*
+=========================================================
+UTILITIES
+=========================================================
+*/
+
+function delay(
+  ms
+) {
+
+  return new Promise(
+    function(resolve) {
+
+      setTimeout(
+        resolve,
+        ms
+      );
+
+    }
+  );
+
+}
+
+
+function createSubmissionId() {
+
+  return (
+    Date.now()
+      .toString(36) +
+
+    "-" +
+
+    Math.random()
+      .toString(36)
+      .substring(
+        2,
+        10
+      )
+  );
+
+}
+
+</script>
+
+</body>
+
+</html>
